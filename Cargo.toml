@@ -2,6 +2,12 @@
 name = "jigsaw"
 version = "0.1.0"
 edition = "2024"
+default-run = "Jigsaw"
+
+# Executable name is the Dock label for `cargo run` (unbundled macOS binaries).
+[[bin]]
+name = "Jigsaw"
+path = "src/main.rs"
 
 [dependencies]
 earcutr = "0.5"

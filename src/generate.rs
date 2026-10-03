@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use rand::Rng;
 
-use crate::piece::{Piece, Puzzle, BOTTOM, LEFT, RIGHT, TOP};
+use crate::piece::{BOTTOM, LEFT, Piece, Puzzle, RIGHT, TOP};
 
 fn next_side_id(rng: &mut impl Rng, used: &mut HashSet<u128>) -> i128 {
     loop {

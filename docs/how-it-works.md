@@ -97,9 +97,11 @@ Only complementary **values** matter, not original grid neighbors. A piece will 
 
 | Action | Effect |
 | --- | --- |
-| Drag | Moves the group; snap runs on release |
-| Click | Selects the group (highlight follows the group, not a single cell) |
-| **R** or right-click | Rotates the group 90° clockwise around its bounding-box center, then tries to snap |
+| Drag | Moves the selected groups; snap runs on release |
+| Drag empty canvas | Rubber-band selects every group the box covers |
+| Click / tap | Selects that group (highlight follows the group, not a single cell) |
+| Click empty canvas | Clears the highlight |
+| **Rotate**, **R**, right-click, double-tap, or long-press | Rotates the selection 90° clockwise around its bounding-box center, then tries to snap |
 | Arrow keys | Nudge, then snap |
 | **Esc** | Clears selection |
 | **Solve Step** | Joins one matching pair automatically |

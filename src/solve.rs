@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use eframe::egui::Vec2;
 
-use crate::board::{sides_match, Board};
+use crate::board::{Board, sides_match};
 use crate::piece::{Piece, Puzzle};
 
 /// Result of attempting one automatic connection.
@@ -21,7 +21,7 @@ pub enum SolveStepResult {
 
 /// True if the piece has any outer (zero) edge — rotation-invariant.
 pub fn is_edge_piece(piece: &Piece) -> bool {
-    piece.sides.iter().any(|&s| s == 0)
+    piece.sides.contains(&0)
 }
 
 fn edge_tier(puzzle: &Puzzle, a: usize, b: usize) -> u8 {
@@ -36,7 +36,10 @@ fn edge_tier(puzzle: &Puzzle, a: usize, b: usize) -> u8 {
 
 /// Collect unmatched complementary seams (different groups), edge-first order.
 /// Returns `(piece_a, side_a, piece_b, side_b)` with `piece_a < piece_b`.
-pub fn find_next_connection(puzzle: &Puzzle, board: &Board) -> Option<(usize, usize, usize, usize)> {
+pub fn find_next_connection(
+    puzzle: &Puzzle,
+    board: &Board,
+) -> Option<(usize, usize, usize, usize)> {
     // side value → (piece, side index)
     let mut by_value: HashMap<i128, (usize, usize)> = HashMap::new();
     for (i, piece) in puzzle.pieces.iter().enumerate() {

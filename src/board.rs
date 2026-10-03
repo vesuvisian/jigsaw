@@ -1,7 +1,9 @@
+use std::collections::HashSet;
+
 use eframe::egui::Vec2;
 use rand::Rng;
 
-use crate::piece::{Puzzle, BOTTOM, LEFT, RIGHT, TOP};
+use crate::piece::{BOTTOM, LEFT, Puzzle, RIGHT, TOP};
 use crate::shape::tab_extent;
 
 /// Piece side length in canvas units (matches UI cell size).
@@ -51,7 +53,10 @@ impl Board {
     pub fn play_size(rows: usize, cols: usize) -> Vec2 {
         let assembled = Vec2::new(cols as f32 * CELL, rows as f32 * CELL);
         // Room to scatter: ~1.5× assembled in each axis.
-        Vec2::new((assembled.x * 1.5).max(assembled.x + CELL), (assembled.y * 1.5).max(assembled.y + CELL))
+        Vec2::new(
+            (assembled.x * 1.5).max(assembled.x + CELL),
+            (assembled.y * 1.5).max(assembled.y + CELL),
+        )
     }
 
     pub fn group_of(&self, piece: usize) -> u32 {
@@ -132,13 +137,12 @@ impl Board {
         best.map(|(i, _)| i)
     }
 
-    /// Bounding-box center of all pieces in `group`.
-    pub fn group_center(&self, group: u32) -> Vec2 {
-        let members = self.group_members(group);
-        assert!(!members.is_empty());
-        let mut min = self.poses[members[0]].pos;
+    /// Bounding-box center of the given pieces.
+    pub fn pieces_center(&self, pieces: &[usize]) -> Vec2 {
+        assert!(!pieces.is_empty());
+        let mut min = self.poses[pieces[0]].pos;
         let mut max = min + Vec2::splat(CELL);
-        for &i in &members[1..] {
+        for &i in &pieces[1..] {
             let p = self.poses[i].pos;
             min = min.min(p);
             max = max.max(p + Vec2::splat(CELL));
@@ -146,11 +150,16 @@ impl Board {
         (min + max) * 0.5
     }
 
-    /// Rotate every piece in `group` 90° CW around the group center; caller updates sides.
-    pub fn rotate_group_poses_cw(&mut self, group: u32) {
-        let center = self.group_center(group);
-        for pose in &mut self.poses {
-            if pose.group != group {
+    /// Bounding-box center of all pieces in `group`.
+    pub fn group_center(&self, group: u32) -> Vec2 {
+        self.pieces_center(&self.group_members(group))
+    }
+
+    /// Rotate the given pieces 90° CW around `center`; caller updates sides.
+    pub fn rotate_poses_cw(&mut self, pieces: &[usize], center: Vec2) {
+        let set: HashSet<usize> = pieces.iter().copied().collect();
+        for (i, pose) in self.poses.iter_mut().enumerate() {
+            if !set.contains(&i) {
                 continue;
             }
             // Piece center → relative → CW 90° in screen space (+y down) → new top-left.
@@ -161,6 +170,27 @@ impl Board {
             let new_center = center + rotated;
             pose.pos = new_center - Vec2::splat(CELL * 0.5);
         }
+    }
+
+    /// Rotate every piece in `group` 90° CW around the group center; caller updates sides.
+    pub fn rotate_group_poses_cw(&mut self, group: u32) {
+        let members = self.group_members(group);
+        let center = self.pieces_center(&members);
+        self.rotate_poses_cw(&members, center);
+    }
+
+    /// Groups whose padded cells overlap the axis-aligned box `min..=max` (play-local).
+    pub fn groups_overlapping_aabb(&self, min: Vec2, max: Vec2) -> Vec<u32> {
+        let pad = tab_extent(CELL);
+        let mut groups = HashSet::new();
+        for pose in &self.poses {
+            let pmin = pose.pos - Vec2::splat(pad);
+            let pmax = pose.pos + Vec2::splat(CELL + pad);
+            if pmin.x <= max.x && pmax.x >= min.x && pmin.y <= max.y && pmax.y >= min.y {
+                groups.insert(pose.group);
+            }
+        }
+        groups.into_iter().collect()
     }
 
     /// Split into singleton groups, randomize positions inside `play`, rotate via `puzzle`.

@@ -1,5 +1,5 @@
 use eframe::egui::Vec2;
-use jigsaw::board::{sides_match, Board, CELL};
+use jigsaw::board::{Board, CELL, sides_match};
 use jigsaw::generate::generate;
 use jigsaw::piece::{BOTTOM, TOP};
 
@@ -45,13 +45,16 @@ fn rotate_group_keeps_joined_seams_facing() {
     // After CW: piece 0 (was left) is above piece 1 (was right).
     let p0 = board.poses[0].pos;
     let p1 = board.poses[1].pos;
-    assert!((p0.x - p1.x).abs() < 0.01, "should stay horizontally aligned");
-    assert!((p1.y - p0.y - CELL).abs() < 0.01, "p0 should sit flush above p1");
     assert!(
-        sides_match(
-            puzzle.pieces[0].sides[BOTTOM],
-            puzzle.pieces[1].sides[TOP]
-        ),
+        (p0.x - p1.x).abs() < 0.01,
+        "should stay horizontally aligned"
+    );
+    assert!(
+        (p1.y - p0.y - CELL).abs() < 0.01,
+        "p0 should sit flush above p1"
+    );
+    assert!(
+        sides_match(puzzle.pieces[0].sides[BOTTOM], puzzle.pieces[1].sides[TOP]),
         "joined values must face each other after CW rotate"
     );
 }
@@ -79,4 +82,19 @@ fn scramble_splits_and_keeps_ids() {
         assert!(pose.pos.x <= Board::play_size(3, 3).x - CELL + 0.01);
         assert!(pose.pos.y <= Board::play_size(3, 3).y - CELL + 0.01);
     }
+}
+
+#[test]
+fn groups_overlapping_aabb_finds_covered_pieces() {
+    let mut board = Board::assembled(2, 2);
+    for (i, pose) in board.poses.iter_mut().enumerate() {
+        pose.group = i as u32;
+    }
+
+    let groups = board.groups_overlapping_aabb(Vec2::ZERO, Vec2::splat(CELL * 0.5));
+    assert_eq!(groups, vec![0]);
+
+    let mut all = board.groups_overlapping_aabb(Vec2::ZERO, Vec2::splat(CELL * 2.0));
+    all.sort_unstable();
+    assert_eq!(all, vec![0, 1, 2, 3]);
 }

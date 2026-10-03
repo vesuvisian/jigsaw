@@ -1,8 +1,8 @@
 use eframe::egui::Vec2;
-use jigsaw::board::{sides_match, Board, CELL};
+use jigsaw::board::{Board, CELL, sides_match};
 use jigsaw::generate::generate;
 use jigsaw::piece::{BOTTOM, LEFT, RIGHT, TOP};
-use jigsaw::solve::{is_edge_piece, solve_step, SolveStepResult};
+use jigsaw::solve::{SolveStepResult, is_edge_piece, solve_step};
 
 fn unique_groups(board: &Board) -> usize {
     let set: std::collections::HashSet<_> = board.poses.iter().map(|p| p.group).collect();
@@ -19,7 +19,10 @@ fn split_singletons(board: &mut Board) {
 fn solve_step_on_assembled_is_complete() {
     let mut puzzle = generate(3, 3);
     let mut board = Board::assembled(3, 3);
-    assert_eq!(solve_step(&mut puzzle, &mut board), SolveStepResult::Complete);
+    assert_eq!(
+        solve_step(&mut puzzle, &mut board),
+        SolveStepResult::Complete
+    );
     assert_eq!(unique_groups(&board), 1);
 }
 
@@ -35,7 +38,10 @@ fn solve_step_connects_one_pair() {
 
     let before = unique_groups(&board);
     let result = solve_step(&mut puzzle, &mut board);
-    assert!(matches!(result, SolveStepResult::Connected { group_size: 2, .. }));
+    assert!(matches!(
+        result,
+        SolveStepResult::Connected { group_size: 2, .. }
+    ));
     assert_eq!(unique_groups(&board), before - 1);
 
     let SolveStepResult::Connected {
@@ -53,7 +59,10 @@ fn solve_step_connects_one_pair() {
         let opp = (side + 2) % 4;
         sides_match(pa.sides[side], pb.sides[opp])
     });
-    assert!(facing, "connected pieces must have complementary sides facing");
+    assert!(
+        facing,
+        "connected pieces must have complementary sides facing"
+    );
 }
 
 #[test]
@@ -85,7 +94,10 @@ fn solve_step_rotates_misoriented_partner() {
     let d = board.poses[1].pos - board.poses[0].pos;
     let flush = (d.x.abs() < 0.01 && (d.y.abs() - CELL).abs() < 0.01)
         || (d.y.abs() < 0.01 && (d.x.abs() - CELL).abs() < 0.01);
-    assert!(flush, "pieces should sit flush after solve step, delta={d:?}");
+    assert!(
+        flush,
+        "pieces should sit flush after solve step, delta={d:?}"
+    );
 }
 
 #[test]
@@ -125,7 +137,10 @@ fn solve_step_prefers_edge_pieces_first() {
     };
     assert!(piece_a == center || piece_b == center);
     assert_eq!(unique_groups(&board), 1);
-    assert_eq!(solve_step(&mut puzzle, &mut board), SolveStepResult::Complete);
+    assert_eq!(
+        solve_step(&mut puzzle, &mut board),
+        SolveStepResult::Complete
+    );
 }
 
 #[test]

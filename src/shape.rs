@@ -195,13 +195,7 @@ fn map_tn(seam_origin: Pos2, along: Vec2, outward: Vec2, cell: f32, t: f64, n: f
     seam_origin + along * (t as f32 * cell) + outward * (n as f32 * cell)
 }
 
-fn edge_samples(
-    seam_origin: Pos2,
-    along: Vec2,
-    outward: Vec2,
-    cell: f32,
-    side: i128,
-) -> Vec<Pos2> {
+fn edge_samples(seam_origin: Pos2, along: Vec2, outward: Vec2, cell: f32, side: i128) -> Vec<Pos2> {
     sample_beziers(&generate_edge_beziers(side))
         .into_iter()
         .map(|p| map_tn(seam_origin, along, outward, cell, p.x, p.y))
@@ -220,10 +214,34 @@ pub fn piece_outline(origin: Pos2, cell: f32, sides: [i128; 4]) -> Vec<Pos2> {
 
     // Seam space is always left→right / top→bottom; reverse when walking CW on bottom/left.
     let seams = [
-        (tl, Vec2::new(1.0, 0.0), Vec2::new(0.0, -1.0), false, sides[TOP]),
-        (tr, Vec2::new(0.0, 1.0), Vec2::new(1.0, 0.0), false, sides[RIGHT]),
-        (bl, Vec2::new(1.0, 0.0), Vec2::new(0.0, 1.0), true, sides[BOTTOM]),
-        (tl, Vec2::new(0.0, 1.0), Vec2::new(-1.0, 0.0), true, sides[LEFT]),
+        (
+            tl,
+            Vec2::new(1.0, 0.0),
+            Vec2::new(0.0, -1.0),
+            false,
+            sides[TOP],
+        ),
+        (
+            tr,
+            Vec2::new(0.0, 1.0),
+            Vec2::new(1.0, 0.0),
+            false,
+            sides[RIGHT],
+        ),
+        (
+            bl,
+            Vec2::new(1.0, 0.0),
+            Vec2::new(0.0, 1.0),
+            true,
+            sides[BOTTOM],
+        ),
+        (
+            tl,
+            Vec2::new(0.0, 1.0),
+            Vec2::new(-1.0, 0.0),
+            true,
+            sides[LEFT],
+        ),
     ];
 
     let mut pts = Vec::new();
@@ -270,7 +288,7 @@ pub fn triangulate_polygon(points: &[Pos2], fill: Color32) -> Mesh {
     let Ok(indices) = earcutr::earcut(&flat, &[], 2) else {
         return mesh;
     };
-    for tri in indices.chunks_exact(3) {
+    for tri in indices.as_chunks::<3>().0 {
         mesh.add_triangle(tri[0] as u32, tri[1] as u32, tri[2] as u32);
     }
     mesh

@@ -1,5 +1,5 @@
 use eframe::egui::{Color32, Pos2, Vec2};
-use jigsaw::shape::{generate_edge_beziers, piece_mesh, piece_outline, CubicBezier, Point2D};
+use jigsaw::shape::{CubicBezier, Point2D, generate_edge_beziers, piece_mesh, piece_outline};
 
 const SAMPLES_PER_BEZIER: usize = 8;
 
@@ -62,15 +62,18 @@ fn flat_outline_is_square() {
     let pts = piece_outline(origin, cell, [0; 4]);
     assert!(pts.len() >= 4);
     assert!(approx_eq(pts[0], origin));
-    assert!(pts
-        .iter()
-        .any(|p| approx_eq(*p, origin + Vec2::new(cell, 0.0))));
-    assert!(pts
-        .iter()
-        .any(|p| approx_eq(*p, origin + Vec2::new(cell, cell))));
-    assert!(pts
-        .iter()
-        .any(|p| approx_eq(*p, origin + Vec2::new(0.0, cell))));
+    assert!(
+        pts.iter()
+            .any(|p| approx_eq(*p, origin + Vec2::new(cell, 0.0)))
+    );
+    assert!(
+        pts.iter()
+            .any(|p| approx_eq(*p, origin + Vec2::new(cell, cell)))
+    );
+    assert!(
+        pts.iter()
+            .any(|p| approx_eq(*p, origin + Vec2::new(0.0, cell)))
+    );
     assert!(!approx_eq(*pts.last().unwrap(), pts[0]));
 }
 
@@ -80,7 +83,10 @@ fn outie_extends_outward_innie_cuts_inward() {
     let cell = 100.0;
     let outie = piece_outline(origin, cell, [0, 42, 0, 0]);
     let max_x = outie.iter().map(|p| p.x).fold(f32::NEG_INFINITY, f32::max);
-    assert!(max_x > cell + 8.0, "outie tip should protrude past right edge");
+    assert!(
+        max_x > cell + 8.0,
+        "outie tip should protrude past right edge"
+    );
 
     let innie = piece_outline(origin, cell, [0, -42, 0, 0]);
     let min_x_mid = innie
@@ -101,11 +107,7 @@ fn complementary_sides_mirror_across_seam() {
     let left = piece_outline(Pos2::ZERO, cell, [0, v, 0, 0]);
     let right = piece_outline(Pos2::new(cell, 0.0), cell, [0, 0, 0, -v]);
 
-    let left_tab: Vec<Pos2> = left
-        .iter()
-        .copied()
-        .filter(|p| p.x > cell - 1.0)
-        .collect();
+    let left_tab: Vec<Pos2> = left.iter().copied().filter(|p| p.x > cell - 1.0).collect();
     assert!(!left_tab.is_empty());
 
     for lp in &left_tab {
@@ -184,10 +186,7 @@ fn shape_is_pure_function_of_side_value() {
     assert_eq!(a, b);
     let lo = generate_edge_beziers(0x11);
     let hi = generate_edge_beziers(0x11i128 | (0xAAi128 << 64));
-    assert_ne!(
-        lo, hi,
-        "upper bytes of magnitude must influence shape"
-    );
+    assert_ne!(lo, hi, "upper bytes of magnitude must influence shape");
 }
 
 #[test]
