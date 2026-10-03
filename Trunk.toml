@@ -1,0 +1,13 @@
+[build]
+# Relative URLs so GitHub Pages project sites (…/repo/) resolve assets.
+dist = "docs/app"
+public_url = "./"
+filehash = true
+
+[watch]
+ignore = ["dist", "docs"]
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 8080
+open = false

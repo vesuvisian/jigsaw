@@ -1,0 +1,61 @@
+[project]
+site_name = "Jigsaw Puzzle Generator"
+site_description = "Generate, scramble, solve, and export interlocking jigsaw puzzles."
+site_url = "https://vesuvisian.com/jigsaw/"
+repo_url = "https://github.com/vesuvisian/jigsaw"
+repo_name = "vesuvisian/jigsaw"
+docs_dir = "docs"
+site_dir = "site"
+
+nav = [
+  { "Play" = "index.md" },
+  { "How it works" = "how-it-works.md" },
+]
+
+extra_css = ["stylesheets/extra.css"]
+
+[project.extra]
+generator = false
+
+[project.plugins.search]
+enabled = false
+
+[project.theme]
+language = "en"
+favicon = "images/favicon.svg"
+features = [
+  "content.code.copy",
+  "header.autohide",
+]
+
+[project.theme.icon]
+logo = "lucide/puzzle"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to system preference"
+
+[project.markdown_extensions]
+admonition = {}
+attr_list = {}
+md_in_html = {}
+toc.permalink = true
+pymdownx.details = {}
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.superfences = {}
+pymdownx.tabbed.alternate_style = true

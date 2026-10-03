@@ -1,0 +1,5 @@
+/target
+/dist
+/site
+/.venv
+/docs/app

@@ -1,0 +1,39 @@
+/* Header is a centered 61rem grid; an empty repo slot still reserves 11.5rem. */
+.md-header__inner.md-grid {
+  max-width: none;
+}
+
+.md-header__source {
+  display: none;
+  width: 0;
+  max-width: 0;
+  margin: 0;
+}
+
+/* Default primary nav is 12.1rem — too wide for two short labels. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    width: 9rem;
+  }
+
+  [dir="ltr"] .md-sidebar--primary .md-sidebar__inner {
+    padding-right: calc(100% - 8.4rem);
+  }
+
+  [dir="rtl"] .md-sidebar--primary .md-sidebar__inner {
+    padding-left: calc(100% - 8.4rem);
+  }
+}
+
+.jigsaw-frame-wrap {
+  margin: 0.5rem 0 1.5rem;
+}
+
+.jigsaw-frame {
+  display: block;
+  width: 100%;
+  height: min(80vh, 720px);
+  border: 0;
+  border-radius: 0.25rem;
+  background: #909090;
+}
